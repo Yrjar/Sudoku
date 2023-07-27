@@ -1,4 +1,3 @@
-from typing import Any
 import numpy as np
 import pygame as pg
 from dataclasses import dataclass
@@ -23,6 +22,24 @@ class SudokuBoard():
                 self.board[i][j].square = square_idx
                 self.squares[square_idx].cells.append(self.board[i][j])
 
+        predefined_values = np.array([  [0,0,0,0,0,5,8,0,0],
+                                        [3,0,0,8,0,0,0,0,1],
+                                        [0,4,2,0,6,1,0,0,0],
+                                        [6,0,0,2,0,0,0,0,0],
+                                        [0,0,0,0,9,0,0,6,0],
+                                        [0,0,0,3,1,0,4,8,5],
+                                        [0,0,0,0,8,0,0,0,0],
+                                        [0,0,0,0,0,2,7,1,0],
+                                        [2,3,0,6,0,0,0,0,0]])
+        
+    
+        
+        for i in range(9):
+            for j in range(9):
+                if predefined_values[i][j] != 0:
+                    self.board[i][j].value = predefined_values[i][j]
+                    self.board[i][j].update(self)
+
 
     def draw_grid(self, screen, window_size, board_size, cell_size):
         for i in range(10):
@@ -37,11 +54,27 @@ class SudokuBoard():
         container_list = [self.rows, self.cols, self.squares]
         for containers in container_list:
             for container in containers:
+                self._single_candidate(container, solve= True)
+                
+                
+    def _single_candidate(self, container, solve= False):
+        for cell in container.cells:
+            if len(cell.possible_values) != 1:
                 pass
+            else:
+                if solve:
+                    cell.value = cell.possible_values[0]
+                else:
+                    # remove value from other cells in container
+                    for other_cell in container.cells:
+                        if other_cell == cell:
+                            pass
+                        elif cell.possible_values[0] in other_cell.possible_values:
+                            other_cell.possible_values.remove(cell.possible_values[0])
 
-        
 
-
+                
+                        
     def __repr__(self) -> str:
         # Print with lines between each 3x3 square
         repr_str = ''
@@ -113,7 +146,7 @@ class SudokuCell():
                     if self.value in board.squares[self.square].cells[i].possible_values:
                         board.squares[self.square].cells[i].possible_values.remove(self.value)
         else:
-            self.possible_values = [1,2,3,4,5,6,7,8,9]
+            # self.possible_values = [1,2,3,4,5,6,7,8,9]
             for i in range(9):
                 if board.rows[self.row].cells[i].value != 0:
                     if board.rows[self.row].cells[i].value in self.possible_values:

@@ -114,6 +114,12 @@ class SudokuGame():
                     for cell in self.board.board.flatten():
                         cell.update(self.board)
 
+                # Find hidden subsets
+                if event.key == pg.K_SPACE:
+                    self.board.isolate_subsets()
+                    # update possible values of all cells
+                    for cell in self.board.board.flatten():
+                        cell.update(self.board)
             
 
 
